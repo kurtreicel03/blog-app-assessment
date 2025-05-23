@@ -6,6 +6,16 @@ import PostImage from "./Image";
 import { useNavigate } from "react-router-dom";
 
 import Loader from "../components/Loader";
+
+interface Updates {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  author: string;
+  imageUrl: string | null;
+}
+
 const BlogForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -22,16 +32,16 @@ const BlogForm: React.FC = () => {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (post) {
-      dispatch(
-        updatePost({
-          id: post.id,
-          title,
-          description,
-          content,
-          author,
-          imageUrl: post.imageUrl || imageUrl,
-        })
-      );
+      const updates: Updates = {
+        id: post.id,
+        title: title !== post.title ? title : "",
+        description: description !== post.description ? description : "",
+        content: content !== post.content ? content : "",
+        author: author !== post.author ? author : "",
+        imageUrl: imageUrl !== post.imageUrl ? imageUrl : null,
+      };
+
+      dispatch(updatePost(updates));
     } else {
       dispatch(
         createPost({
@@ -44,7 +54,7 @@ const BlogForm: React.FC = () => {
       );
     }
 
-    navigate("/");
+    navigate(`/post/${post?.id}`);
   };
 
   const form = (

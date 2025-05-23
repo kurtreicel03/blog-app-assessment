@@ -112,20 +112,19 @@ export const updatePost = createAsyncThunk(
     content: string;
     description: string;
     author: string;
-    imageUrl: string;
+    imageUrl: string | null;
   }) => {
     const updates: Partial<Post> = {};
-    console.log("imgeurl", imageUrl);
-    if (title !== undefined || title !== null) updates.title = title;
-    if (content !== undefined || content !== null) updates.content = content;
-    if (description !== undefined || description !== null)
-      updates.description = description;
-    if (author !== undefined || author !== null) updates.author = author;
-    if (imageUrl !== undefined || imageUrl !== null)
-      updates.imageUrl = imageUrl;
+    if (title) updates.title = title;
+    if (content) updates.content = content;
+    if (description) updates.description = description;
+    if (author) updates.author = author;
+    if (imageUrl) updates.imageUrl = imageUrl;
+
+    console.log(updates);
 
     if (Object.keys(updates).length === 0) {
-      return {};
+      return updates;
     }
 
     const { data, error } = await supabase
@@ -142,7 +141,7 @@ export const updatePost = createAsyncThunk(
 
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
-  async (id: string) => {
+  async (id: string | undefined) => {
     const { error } = await supabase.from("posts").delete().eq("id", id);
     if (error) throw new Error(error.message);
     return id;
@@ -214,8 +213,35 @@ const postsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to update post";
       })
-      .addCase(deletePost.fulfilled, (state, action: PayloadAction<string>) => {
-        state.posts = state.posts.filter((post) => post.id !== action.payload);
+      .addCase(
+        updatePost.fulfilled,
+        (state, action: PayloadAction<Partial<Post>>) => {
+          state.loading = false;
+          state.error = null;
+          if (action.payload.id) {
+            const index = state.posts.findIndex(
+              (p) => p.id === action.payload.id
+            );
+            if (index !== -1) {
+              state.posts[index] = {
+                ...state.posts[index],
+                ...action.payload,
+              };
+            }
+          }
+        }
+      )
+      .addCase(
+        deletePost.fulfilled,
+        (state, action: PayloadAction<string | undefined>) => {
+          state.posts = state.posts.filter(
+            (post) => post.id !== action.payload
+          );
+        }
+      )
+      .addCase(deletePost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to delete post";
       });
   },
 });
