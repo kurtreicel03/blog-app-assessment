@@ -18,6 +18,7 @@ interface FetchPostParams {
   sortOrder: "asc" | "desc";
   start: number;
   end: number;
+  created_by: string | undefined;
 }
 
 interface PostsState {
@@ -39,12 +40,22 @@ const initialState: PostsState = {
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (params: FetchPostParams): Promise<{ data: Post[]; total: number }> => {
-    const { search, sortOrder, start, end } = params;
+    const { search, sortOrder, start, end, created_by } = params;
+    console.log("", search, sortOrder, start, end, created_by);
     let query = supabase
       .from<"posts", Post>("posts")
-      .select("*", { count: "exact" })
-      .order("created_at", { ascending: sortOrder === "asc" })
-      .range(start, end);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .select("*", { count: "exact" }) as any;
+
+    query = query.order("created_at", {
+      ascending: sortOrder === "asc",
+    });
+
+    if (created_by) {
+      query = query.eq("created_by", created_by);
+    }
+
+    query = query.range(start, end);
 
     if (search) {
       query = query.or(
@@ -75,7 +86,7 @@ export const fetchPostById = createAsyncThunk(
 );
 
 export const createPost = createAsyncThunk<
-  Post[],
+  Post,
   {
     title: string;
     content: string;
@@ -89,10 +100,11 @@ export const createPost = createAsyncThunk<
     const { data, error } = await supabase
       .from("posts")
       .insert([{ title, content, description, author, imageUrl }])
-      .select();
+      .select()
+      .single();
 
     if (error) throw new Error(error.message);
-    console.log(data);
+
     return data;
   }
 );
@@ -196,10 +208,9 @@ const postsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createPost.fulfilled, (state, action: PayloadAction<Post[]>) => {
-        console.log(action.payload);
+      .addCase(createPost.fulfilled, (state, action: PayloadAction<Post>) => {
         state.loading = false;
-        state.posts.unshift(...action.payload);
+        state.post = action.payload;
       })
       .addCase(createPost.rejected, (state, action) => {
         state.loading = false;

@@ -31,7 +31,9 @@ const BlogForm: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (post) {
+      console.log("update");
       const updates: Updates = {
         id: post.id,
         title: title !== post.title ? title : "",
@@ -43,6 +45,7 @@ const BlogForm: React.FC = () => {
 
       dispatch(updatePost(updates));
     } else {
+      console.log("create");
       dispatch(
         createPost({
           title,

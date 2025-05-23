@@ -6,8 +6,14 @@ import { reset } from "../features/PostSlice";
 import { reset as imageReset } from "../features/UploadSlice";
 type ActionBarProps = {
   setOrder: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
+  filterPost: boolean;
+  setFilterPost: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const ActionBar: React.FC<ActionBarProps> = ({ setOrder }) => {
+const ActionBar: React.FC<ActionBarProps> = ({
+  setOrder,
+  filterPost,
+  setFilterPost,
+}) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const handleClick = () => {
@@ -27,7 +33,16 @@ const ActionBar: React.FC<ActionBarProps> = ({ setOrder }) => {
         >
           ↑↓
         </Button>
-        <Button onClick={handleClick}>My Post</Button>
+        <Button
+          onClick={() => setFilterPost((state) => !state)}
+          className={`rounded-md py-1 px-2 ${
+            filterPost
+              ? "bg-white text-indigo-500 border-2"
+              : "bg-indigo-500  text-white"
+          }`}
+        >
+          {filterPost ? "GET All Post" : "GET My Post"}
+        </Button>
       </div>
       <Button onClick={handleClick}>Add Post</Button>
     </div>

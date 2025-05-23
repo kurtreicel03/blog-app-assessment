@@ -14,16 +14,27 @@ const HomePage = () => {
   const [page, setPage] = useState<number>(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [search, setSearch] = useState<string>("");
+  const [filterPost, setFilterPost] = useState<boolean>(false);
 
   const { total } = useAppSelector((state) => state.post);
+  const { user } = useAppSelector((state) => state.auth);
+
   const pageSize = 10;
   const totalPage = Math.ceil(total / 10);
   const start = (page - 1) * pageSize;
   const end = page * pageSize - 1;
 
   useEffect(() => {
-    dispatch(fetchPosts({ search, sortOrder: order, start: start, end: end }));
-  }, [dispatch, page, end, start, order, search]);
+    dispatch(
+      fetchPosts({
+        search,
+        sortOrder: order,
+        start: start,
+        end: end,
+        created_by: filterPost ? user?.id : undefined,
+      })
+    );
+  }, [dispatch, page, end, start, order, search, filterPost, user?.id]);
 
   return (
     <>
@@ -33,7 +44,11 @@ const HomePage = () => {
       <HomeLayout>
         {
           <>
-            <ActionBar setOrder={setOrder} />
+            <ActionBar
+              setOrder={setOrder}
+              filterPost={filterPost}
+              setFilterPost={setFilterPost}
+            />
             <Posts />
             <Pagination page={page} totalPage={totalPage} setPage={setPage} />
           </>
