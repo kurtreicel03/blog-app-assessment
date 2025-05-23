@@ -10,6 +10,7 @@ export interface Post {
   imageUrl?: string | null;
   author: string;
   created_at: string;
+  created_by: string;
 }
 
 interface FetchPostParams {
@@ -18,8 +19,10 @@ interface FetchPostParams {
   start: number;
   end: number;
 }
+
 interface PostsState {
   posts: Post[];
+  post: Post | null;
   total: number;
   loading: boolean;
   error: string | null;
@@ -27,6 +30,7 @@ interface PostsState {
 
 const initialState: PostsState = {
   posts: [],
+  post: null,
   total: 0,
   loading: false,
   error: null,
@@ -150,8 +154,7 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
-      state.posts = [];
-      state.total = 0;
+      state.post = null;
       state.error = null;
       state.loading = false;
     },
@@ -181,8 +184,9 @@ const postsSlice = createSlice({
       .addCase(
         fetchPostById.fulfilled,
         (state, action: PayloadAction<Post>) => {
+          console.log(action.payload);
           state.loading = false;
-          state.posts = [action.payload];
+          state.post = action.payload;
         }
       )
       .addCase(fetchPostById.rejected, (state, action) => {

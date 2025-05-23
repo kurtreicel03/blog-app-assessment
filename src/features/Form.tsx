@@ -10,32 +10,26 @@ const BlogForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { imageUrl } = useAppSelector((state) => state.upload);
-  const { posts, loading } = useAppSelector((state) => state.post);
+  const { post, loading } = useAppSelector((state) => state.post);
 
-  const [title, setTitle] = useState<string>(
-    posts.length > 0 ? posts[0].title : ""
-  );
+  const [title, setTitle] = useState<string>(post?.title || "");
   const [description, setDescription] = useState<string>(
-    posts.length > 0 ? posts[0].description : ""
+    post?.description || ""
   );
-  const [content, setContent] = useState<string>(
-    posts.length > 0 ? posts[0].content : ""
-  );
-  const [author, setAuthor] = useState<string>(
-    posts.length > 0 ? posts[0].author : "anonymous"
-  );
+  const [content, setContent] = useState<string>(post?.content || "");
+  const [author, setAuthor] = useState<string>(post?.author || "Anonymous");
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (posts.length > 0) {
+    if (post) {
       dispatch(
         updatePost({
-          id: posts[0].id,
+          id: post.id,
           title,
           description,
           content,
           author,
-          imageUrl: posts[0].imageUrl || imageUrl,
+          imageUrl: post.imageUrl || imageUrl,
         })
       );
     } else {

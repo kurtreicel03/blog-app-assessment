@@ -3,6 +3,7 @@ import Button from "./Button";
 import { useAppSelector, useAppDispatch } from "../hooks";
 import { logout } from "../features/AuthSlice";
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 interface NavBarProps {
   children?: ReactNode;
@@ -18,9 +19,9 @@ const Navbar: React.FC<NavBarProps> = ({ children }) => {
 
   return (
     <nav className="bg-indigo-500 text-white px-30 py-3 flex justify-between items-center ">
-      <div className="text-xl font-bold cursor-pointer">
+      <Link to="/" className="text-xl font-bold cursor-pointer">
         BLOG POST <span className="text-3xl">🔖</span>
-      </div>
+      </Link>
 
       {user && (
         <>

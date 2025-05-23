@@ -8,9 +8,8 @@ const PostImage: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const { imageUrl } = useAppSelector((state) => state.upload);
-  const { posts } = useAppSelector((state) => state.post);
-  const viewUrl =
-    preview ?? imageUrl ?? (posts.length > 0 && posts[0].imageUrl);
+  const { post } = useAppSelector((state) => state.post);
+  const viewUrl = preview ?? imageUrl ?? post?.imageUrl;
 
   useEffect(() => {
     dispatch(reset());

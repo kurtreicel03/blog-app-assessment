@@ -40,7 +40,7 @@ const Pagination: React.FC<PaginationProps> = ({
     </nav>
   );
 
-  return pagination;
+  return totalPage > 0 ? pagination : <></>;
 };
 
 export default Pagination;
